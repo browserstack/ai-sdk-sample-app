@@ -263,21 +263,19 @@ chatAutoRouter.post("/auto", async (req: Request, res: Response) => {
 
   const url = body.projectId ? viewInSandbox(body.projectId, "trace") : "";
 
-  res.write(
-    `event: result\ndata: ${JSON.stringify({
-      type: "result",
-      stage: "chat-auto",
-      status: "done",
-      phase_id: "auto-trace",
-      phase_index: 1,
-      phase_total: 1,
-      log: reply,
-      provider,
-      model,
-      usage,
-      ...(url ? { view_in_sandbox: { label: "View traces in Sandbox", url } } : {}),
-    })}\n\n`
-  );
+  emit.emit("result", {
+    type: "result",
+    stage: "chat-auto",
+    status: "done",
+    phase_id: "auto-trace",
+    phase_index: 1,
+    phase_total: 1,
+    log: reply,
+    provider,
+    model,
+    usage,
+    ...(url ? { view_in_sandbox: { label: "View traces in Sandbox", url } } : {}),
+  });
 
   emit.phaseEnd();
   emit.done();

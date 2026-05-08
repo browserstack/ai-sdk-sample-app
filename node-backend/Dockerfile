@@ -23,6 +23,12 @@ COPY node-backend/data /app/node-backend/data
 RUN npm install --no-audit --no-fund --include=dev typescript && \
     npx tsc -p .
 
+# Run as the pre-built non-root `node` user (defense in depth — limits blast
+# radius if the container process is compromised). The official node images
+# ship this user out of the box.
+RUN chown -R node:node /app
+USER node
+
 EXPOSE 3001
 
 CMD ["node", "dist/server.js"]

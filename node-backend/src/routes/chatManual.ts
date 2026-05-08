@@ -249,23 +249,21 @@ chatManualRouter.post("/manual", async (req: Request, res: Response) => {
     traceUrl = viewInSandbox(body.projectId, "trace", traceId);
   }
 
-  res.write(
-    `event: result\ndata: ${JSON.stringify({
-      type: "result",
-      stage: "chat-manual",
-      status: "done",
-      phase_id: "manual-trace",
-      phase_index: 1,
-      phase_total: 1,
-      log: reply,
-      provider,
-      model,
-      usage,
-      ...(traceUrl
-        ? { view_in_sandbox: { label: "View trace in Sandbox", url: traceUrl } }
-        : {}),
-    })}\n\n`
-  );
+  emit.emit("result", {
+    type: "result",
+    stage: "chat-manual",
+    status: "done",
+    phase_id: "manual-trace",
+    phase_index: 1,
+    phase_total: 1,
+    log: reply,
+    provider,
+    model,
+    usage,
+    ...(traceUrl
+      ? { view_in_sandbox: { label: "View trace in Sandbox", url: traceUrl } }
+      : {}),
+  });
 
   emit.phaseEnd();
   emit.done();

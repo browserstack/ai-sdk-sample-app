@@ -96,6 +96,16 @@ export class SnippetEmitter {
   }
 
   /**
+   * Emits a custom SSE event with a caller-supplied payload. Used by the
+   * chat handlers (manual + auto) which need to add chat-specific fields
+   * like `provider`, `model`, `usage` that the generic `result()` helper
+   * doesn't carry.
+   */
+  emit(eventType: string, payload: Record<string, unknown>): void {
+    this.write(eventType, payload);
+  }
+
+  /**
    * Emits a terminal `error` event and closes the stream.
    */
   error(msg: string): void {

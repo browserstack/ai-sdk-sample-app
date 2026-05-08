@@ -11,8 +11,8 @@ from __future__ import annotations
 import asyncio
 import base64
 import os
-import urllib.error
-import urllib.request
+
+import httpx
 
 from browserstack_ai_sdk import AISDK
 
@@ -42,20 +42,20 @@ async def trace_exists(
     if not trace_id:
         return False
     auth = base64.b64encode(f"{public_key}:{secret_key}".encode()).decode()
-    url = f"{SANDBOX_BASE_URL}/api/public/traces/{trace_id}"
-    for attempt in range(max_attempts):
-        try:
-            req = urllib.request.Request(url, headers={"Authorization": f"Basic {auth}"})
-            with urllib.request.urlopen(req, timeout=2) as resp:
-                if resp.status == 200:
+    headers = {"Authorization": f"Basic {auth}"}
+    path = f"/api/public/traces/{trace_id}"
+    async with httpx.AsyncClient(base_url=SANDBOX_BASE_URL, timeout=2.0) as http:
+        for attempt in range(max_attempts):
+            try:
+                resp = await http.get(path, headers=headers)
+                if resp.status_code == 200:
                     return True
-        except urllib.error.HTTPError as exc:
-            if exc.code != 404:
+                if resp.status_code != 404:
+                    return False
+            except httpx.HTTPError:
                 return False
-        except Exception:  # noqa: BLE001
-            return False
-        if attempt < max_attempts - 1:
-            await asyncio.sleep(delay_seconds)
+            if attempt < max_attempts - 1:
+                await asyncio.sleep(delay_seconds)
     return False
 
 

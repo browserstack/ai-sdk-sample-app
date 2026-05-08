@@ -19,6 +19,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy backend source
 COPY python-backend/ /app/
 
+# Run as a non-root user (defense in depth — limits blast radius if the
+# container process is compromised). The home dir is needed for tools that
+# scribble caches under $HOME (uvicorn doesn't, but transitive deps may).
+RUN groupadd --system app && useradd --system --gid app --create-home --home-dir /home/app app && \
+    chown -R app:app /app
+USER app
+
 EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info"]
