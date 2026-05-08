@@ -1,0 +1,16 @@
+{
+  "in_scope": [
+    {"query": "Where is my order #4831?", "expected_tool": "lookup_product"},
+    {"query": "Can you email me the order update?", "expected_tool": "send_email"},
+    {"query": "What is my account status?", "expected_tool": "get_user_details"},
+    {"query": "Show me docs on returns", "expected_tool": "retrieve_docs"},
+    {"query": "Look up product details for SKU 8821", "expected_tool": "lookup_product"},
+    {"query": "Email the receipt to my address on file", "expected_tool": "send_email"}
+  ],
+  "out_of_scope": [
+    {"query": "Tell me about quantum mechanics", "expected_tool": null},
+    {"query": "Write me a sonnet about Tokyo", "expected_tool": null},
+    {"query": "What is the weather like today?", "expected_tool": null},
+    {"query": "Recommend a movie to watch tonight", "expected_tool": null}
+  ]
+}

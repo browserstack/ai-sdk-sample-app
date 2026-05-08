@@ -1,0 +1,6 @@
+input,expected_tool,scope
+"Where is my order #4831?",lookup_product,in
+"Can you email me the order update?",send_email,in
+"What is my account status?",get_user_details,in
+"Show me docs on returns",retrieve_docs,in
+"Tell me about quantum mechanics",,out_of_scope

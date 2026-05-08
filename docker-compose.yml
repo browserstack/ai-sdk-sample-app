@@ -1,0 +1,40 @@
+services:
+  python-backend:
+    build:
+      context: .
+      dockerfile: python-backend/Dockerfile
+    container_name: walkthrough-python
+    ports:
+      - "8000:8000"
+    environment:
+      - TESTOPS_HOST=https://evals.browserstack.com
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./shared-frontend:/app/shared-frontend:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz')\""]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  node-backend:
+    build:
+      context: .
+      dockerfile: node-backend/Dockerfile
+    container_name: walkthrough-node
+    ports:
+      - "3001:3001"
+    environment:
+      - TESTOPS_HOST=https://evals.browserstack.com
+      - NODE_ENV=production
+    volumes:
+      - ./shared-frontend:/app/shared-frontend:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/healthz || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
