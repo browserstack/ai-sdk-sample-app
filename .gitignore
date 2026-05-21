@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+.npm/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+build/
+*.log
+
+# Don't commit SDK tarballs to git history (keep local for now)
+sdk-vendor/*.tar.gz
+sdk-vendor/*.tgz

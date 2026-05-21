@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evals sample app</title>
+  <!-- Tailwind: self-hosted, generated from project sources via the Tailwind
+       CLI. Re-run `npx tailwindcss -i tailwind.input.css -o
+       shared-frontend/tailwind.css --minify` after class changes. -->
+  <link rel="stylesheet" href="./tailwind.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css"
+        integrity="sha384-wFjoQjtV1y5jVHbt0p35Ui8aV8GVpEZkyF99OXWqP/eNJDU93D3Ugxkoyh6Y2I4A"
+        crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-core.min.js"
+          integrity="sha384-MXybTpajaBV0AkcBaCPT4KIvo0FzoCiWXgcihYsw4FUkEz0Pv3JGV6tk2G8vJtDc"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-clike.min.js"
+          integrity="sha384-7LHwxHIDSHTBleLmgDWZbC/IMJsfYfFVOihKhvsrxYW4j47YQcRwZja4ToFE3bA8"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-javascript.min.js"
+          integrity="sha384-D44bgYYKvaiDh4cOGlj1dbSDpSctn2FSUj118HZGmZEShZcO2v//Q5vvhNy206pp"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"
+          integrity="sha384-PeOqKNW/piETaCg8rqKFy+Pm6KEk7e36/5YZE5XO/OaFdO+/Aw3O8qZ9qDPKVUgx"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"
+          integrity="sha384-WJdEkJKrbsqw0evQ4GB6mlsKe5cGTxBOw4KAEIa52ZLB7DDpliGkwdme/HMa5n1m"
+          crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@13.0.3/marked.min.js"
+          integrity="sha384-YTBHtsL8yVTHcLakYNyrOfK3K+QQcXiECuaALJ+3j7Mo681Rtzadt8NR6WrZH+eQ"
+          crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <!-- ─── App shell ─────────────────────────────────────────────────────── -->
+  <div class="app-shell">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark">T</div>
+        <div>
+          <div class="brand-title">Evals sample app</div>
+          <div class="brand-sub">SDK Walkthrough</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Connection</div>
+        <button class="sidebar-item" data-route="connect">
+          <span class="sidebar-dot" id="auth-status-dot"></span>
+          <span>Sandbox keys</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Tracing</div>
+        <button class="sidebar-item locked" data-route="tracing/manual">
+          <span class="sidebar-icon">M</span>
+          <span>Manual tracing</span>
+        </button>
+        <button class="sidebar-item locked" data-route="tracing/auto">
+          <span class="sidebar-icon">A</span>
+          <span>Auto tracing</span>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Workflows</div>
+        <button class="sidebar-item locked" data-route="workflow/prompt-compile">
+          <span class="sidebar-icon">1</span>
+          <span>Prompt Compile</span>
+        </button>
+        <button class="sidebar-item locked" data-route="workflow/dataset-run">
+          <span class="sidebar-icon">2</span>
+          <span>Dataset Run</span>
+        </button>
+        <button class="sidebar-item locked" data-route="workflow/eval-execution">
+          <span class="sidebar-icon">3</span>
+          <span>Eval Execution</span>
+        </button>
+        <button class="sidebar-item locked" data-route="workflow/experiment-run">
+          <span class="sidebar-icon">4</span>
+          <span>Experiment Run</span>
+        </button>
+      </div>
+
+      <div class="sidebar-foot">
+        <div class="backend-toggle">
+          <span class="backend-label">Backend</span>
+          <label class="seg-radio"><input type="radio" name="backend" value="python" /><span>Python</span></label>
+          <label class="seg-radio"><input type="radio" name="backend" value="node" /><span>Node</span></label>
+        </div>
+        <button id="signout-btn" class="signout-btn hidden">Sign out</button>
+      </div>
+    </aside>
+
+    <!-- Main area -->
+    <main class="content" id="content">
+
+      <!-- ───────────── Connect (auth gate) ───────────── -->
+      <section class="route" data-route="connect">
+        <div class="content-hero">
+          <h2>Connect your Sandbox project</h2>
+          <p class="subtitle">Paste your Sandbox API keys + an LLM provider key. We'll keep them for this browser session only — refresh-safe, never sent anywhere except <code>evals.browserstack.com</code>.</p>
+          <div class="mt-3">
+            <a href="https://evals.browserstack.com" target="_blank" rel="noopener" class="open-sandbox-btn">
+              Open evals.browserstack.com
+              <span class="open-sandbox-arrow">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-4xl">
+          <div class="card">
+            <p class="card-header">Sandbox <span class="text-red-500 font-bold">*</span></p>
+            <label class="field-label">Sandbox public key</label>
+            <div class="key-input-row"><input type="password" data-key="sandboxPublic" placeholder="pk-to-..." class="key-input" /><button type="button" class="eye-btn" data-toggle="sandboxPublic">Show</button></div>
+            <p class="err" data-err="sandboxPublic"></p>
+            <label class="field-label mt-3">Sandbox secret key</label>
+            <div class="key-input-row"><input type="password" data-key="sandboxSecret" placeholder="sk-to-..." class="key-input" /><button type="button" class="eye-btn" data-toggle="sandboxSecret">Show</button></div>
+            <p class="err" data-err="sandboxSecret"></p>
+            <p class="card-foot-hint">In Sandbox: gear icon &rarr; <strong>Project Settings</strong> &rarr; <strong>API keys</strong> &rarr; generate.</p>
+          </div>
+          <div class="card">
+            <p class="card-header">LLM provider <span class="text-amber-500 font-medium normal-case tracking-normal">— at least one</span></p>
+            <label class="field-label">OpenAI key</label>
+            <div class="key-input-row"><input type="password" data-key="openai" placeholder="sk-..." class="key-input" /><button type="button" class="eye-btn" data-toggle="openai">Show</button></div>
+            <p class="err" data-err="openai"></p>
+            <label class="field-label mt-3">Anthropic key</label>
+            <div class="key-input-row"><input type="password" data-key="anthropic" placeholder="sk-ant-..." class="key-input" /><button type="button" class="eye-btn" data-toggle="anthropic">Show</button></div>
+            <p class="err" data-err="anthropic"></p>
+            <p class="card-foot-hint">Also add an <strong>LLM connection</strong> on the project for the model you'll use &mdash; gear icon &rarr; <strong>Project Settings</strong> &rarr; <strong>LLM connections</strong>.</p>
+          </div>
+        </div>
+
+        <div class="mt-6 flex items-center gap-4">
+          <button id="connect-btn" class="btn-primary" disabled>Validate &amp; continue</button>
+          <span id="auth-message" class="text-sm muted"></span>
+        </div>
+
+        <div class="mt-4 hidden" id="auth-snippet-host">
+          <p class="card-header" style="color:#9ca3af">Validation call</p>
+          <div id="auth-snippet-panel"></div>
+        </div>
+      </section>
+
+      <!-- ───────────── Tracing: manual ───────────── -->
+      <section class="route hidden" data-route="tracing/manual">
+        <div class="content-hero">
+          <h2>Manual tracing</h2>
+          <p class="subtitle">You wrap the LLM call yourself — <code>client.trace()</code> + <code>start_generation()</code> + <code>.score()</code>. Use this when you need explicit control over what gets traced.</p>
+        </div>
+
+        <div class="card mb-4">
+          <p class="card-header">Provider &amp; model</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="field-label">Provider</label><select id="manual-provider-select" class="key-input"></select></div>
+            <div><label class="field-label">Model</label><select id="manual-model-select" class="key-input"></select></div>
+          </div>
+        </div>
+
+        <div class="split-panel">
+          <div class="card flex flex-col">
+            <p class="card-header">Chat</p>
+            <div id="manual-chat-history" class="flex-1 overflow-auto space-y-3 text-sm"></div>
+            <form id="manual-chat-form" class="flex gap-2 mt-3"><input id="manual-chat-input" type="text" placeholder="Ask the bot something…" class="key-input flex-1" /><button class="btn-primary text-sm">Send</button></form>
+          </div>
+          <div class="card overflow-auto">
+            <p class="card-header">SDK calls that ran</p>
+            <div id="manual-sdk-panel"><p class="muted text-sm">Send a message and the full SDK script will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────────── Tracing: auto ───────────── -->
+      <section class="route hidden" data-route="tracing/auto">
+        <div class="content-hero">
+          <h2>Auto tracing</h2>
+          <p class="subtitle">Call <code>Observe.init()</code> once and the SDK auto-instruments OpenAI, Anthropic, LangChain, and friends. Every LLM call is traced without you writing a single span.</p>
+        </div>
+
+        <div class="card mb-4">
+          <p class="card-header">Provider &amp; model</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="field-label">Provider</label><select id="auto-provider-select" class="key-input"></select></div>
+            <div><label class="field-label">Model</label><select id="auto-model-select" class="key-input"></select></div>
+          </div>
+          <div id="auto-langchain-warning" class="hidden mt-3 log-note">
+            <strong>Note:</strong> the Python SDK doesn't dedup LangChain + direct OpenAI overlap; we use only the LangChain client here to avoid duplicate spans.
+          </div>
+        </div>
+
+        <div class="split-panel">
+          <div class="card flex flex-col">
+            <p class="card-header">Chat</p>
+            <div id="auto-chat-history" class="flex-1 overflow-auto space-y-3 text-sm"></div>
+            <form id="auto-chat-form" class="flex gap-2 mt-3"><input id="auto-chat-input" type="text" placeholder="Ask anything — auto-tracing captures it…" class="key-input flex-1" /><button class="btn-primary text-sm">Send</button></form>
+          </div>
+          <div class="card overflow-auto">
+            <p class="card-header">Auto-instrumentation setup</p>
+            <div id="auto-sdk-panel"><p class="muted text-sm">Send a message and the setup + LLM call will appear here.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────────── Workflow runner (shared by all 4) ───────────── -->
+      <section class="route hidden" data-route="workflow">
+        <!-- Top bar: breadcrumb + docs link, lives outside the card -->
+        <div class="wf-topbar">
+          <div class="wf-breadcrumb">
+            <span class="wf-breadcrumb-root">Workflows</span>
+            <span class="wf-breadcrumb-sep">›</span>
+            <span class="wf-breadcrumb-leaf" id="wf-breadcrumb-leaf">Workflow</span>
+          </div>
+          <a class="wf-docs-btn" href="https://docs.browserstack.com/" target="_blank" rel="noopener">
+            <span class="wf-docs-icon" aria-hidden="true">⌥</span>
+            <span>Documentation</span>
+          </a>
+        </div>
+
+        <div class="wf-card">
+          <div class="wf-card-header">
+            <div>
+              <h2 class="wf-title" id="workflow-title">Workflow</h2>
+              <p class="wf-sub" id="workflow-subtitle"></p>
+            </div>
+            <div class="wf-card-header-actions">
+              <button id="workflow-rerun" class="wf-run-btn" disabled>
+                <span class="wf-run-icon">↻</span>
+                <span>RUN AGAIN</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="wf-body">
+            <!-- Left column: phase list -->
+            <aside class="wf-phase-list" id="phase-list"></aside>
+
+            <!-- Right column: active phase detail -->
+            <div class="wf-phase-detail" id="phase-detail">
+              <div class="wf-empty">
+                <div class="wf-empty-icon">⚡</div>
+                <div class="wf-empty-title">Ready to run</div>
+                <div class="wf-empty-text">Click <strong>RUN WORKFLOW</strong> at the top right. We'll show a quick rundown of what'll happen, then execute the steps one by one.</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="workflow-summary" class="wf-summary hidden">
+            <div class="wf-summary-icon">✓</div>
+            <div class="wf-summary-text">
+              <div class="wf-summary-title">Workflow complete</div>
+              <div class="wf-summary-details" id="workflow-summary-details"></div>
+            </div>
+          </div>
+
+          <div class="wf-foot">
+            <span class="wf-foot-label" id="workflow-progress">Sequential runtime ready</span>
+            <span class="wf-foot-status" id="workflow-foot-status"></span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast for "copied" -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 px-3.5 py-2 rounded-md text-sm shadow-lg" style="background:#0f172a;color:#ffffff">Copied!</div>
+
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
