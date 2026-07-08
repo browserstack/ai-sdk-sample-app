@@ -69,7 +69,7 @@ export async function runPromptCompile(
     `await Prompt.create({\n` +
     `  name: "${PROMPT_NAME}",\n` +
     `  type: "text",\n` +
-    `  prompt: \`${PROMPT_TEMPLATE.replace(/`/g, "\\`")}\`,\n` +
+    `  prompt: \`${PROMPT_TEMPLATE.replace(/\\/g, "\\\\").replace(/`/g, "\\`")}\`,\n` +
     `  labels: ["production"],\n` +
     `  modelParams: {\n` +
     `    provider: "openai",\n` +
